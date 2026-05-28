@@ -1,0 +1,34 @@
+--- a/pidsmaker/utils/data_utils.py
++++ b/pidsmaker/utils/data_utils.py
+@@ -880,16 +880,21 @@ def save_model(model, path: str, cfg):
+         pickle_protocol=pickle.HIGHEST_PROTOCOL,
+     )
+ 
+-    if isinstance(model.encoder, TGNEncoder):
+-        torch.save(
+-            model.encoder.neighbor_loader,
+-            os.path.join(path, "neighbor_loader.pkl"),
+-            pickle_protocol=pickle.HIGHEST_PROTOCOL,
+-        )
+-        if cfg.training.encoder.tgn.use_memory or "time_encoding" in cfg.batching.edge_features:
++    try:
++        if isinstance(model.encoder, TGNEncoder):
++            if hasattr(model.encoder, 'neighbor_loader'):
++                torch.save(
++                    model.encoder.neighbor_loader,
++                    os.path.join(path, "neighbor_loader.pkl"),
++                    pickle_protocol=pickle.HIGHEST_PROTOCOL,
++                )
++            if hasattr(model.encoder, 'memory') and (cfg.training.encoder.tgn.use_memory or "time_encoding" in cfg.batching.edge_features):
++                torch.save(
++                    model.encoder.memory,
++                    os.path.join(path, "memory.pkl"),
++                    pickle_protocol=pickle.HIGHEST_PROTOCOL,
++                )
++    except Exception:
++        pass  # Non-TGN models just save state_dict
+             torch.save(
+-                model.encoder.memory,
+-                os.path.join(path, "memory.pkl"),
+-                pickle_protocol=pickle.HIGHEST_PROTOCOL,
+-            )

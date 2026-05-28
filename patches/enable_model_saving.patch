@@ -1,0 +1,31 @@
+--- a/pidsmaker/detection/training_methods/training_loop.py
++++ b/pidsmaker/detection/training_methods/training_loop.py
+@@ -28,6 +28,9 @@ from pidsmaker.utils.utils import get_device, log, log_start, log_tqdm, set_seed
+ 
+ from . import inference_loop
+ 
++import os
++from pidsmaker.utils.data_utils import save_model, load_model
++
+ 
+ def main(cfg):
+     set_seed(cfg, seed=cfg.training.seed)
+@@ -47,6 +50,7 @@ def main(cfg):
+ 
+     train_data, val_data, test_data, max_node_num = get_preprocessed_graphs(cfg)
+ 
++    gnn_models_dir = os.path.join(cfg.training._task_path, "gnn_models")
+     model = build_model(
+         data_sample=train_data[0][0], device=device, cfg=cfg, max_node_num=max_node_num
+     )
+@@ -218,8 +222,8 @@ def main(cfg):
+             model.load_state_dict(best_model)
+             model.to_device(device)
+ 
+-        # model_path = os.path.join(gnn_models_dir, f"model_epoch_{epoch}")
+-        # save_model(model, model_path, cfg)
++        model_path = os.path.join(gnn_models_dir, f"model_epoch_{epoch}")
++        save_model(model, model_path, cfg)
+ 
+         # Test
+         if (epoch + 1) % 2 == 0 or epoch == 0:

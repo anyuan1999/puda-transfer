@@ -1,0 +1,11 @@
+# Replace PyTorch install lines in Dockerfile for H20 (Hopper, CUDA 12.4)
+# Original:
+#   RUN pip install torch==1.13.1+cu117 ...
+#   RUN pip install torch_geometric==2.5.3 ...
+# Replace with:
+
+RUN pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cu124
+
+RUN pip install torch_geometric==2.6.0 --no-cache-dir && \
+    pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv \
+    -f https://data.pyg.org/whl/torch-2.4.0+cu124.html --no-cache-dir
