@@ -1,12 +1,13 @@
 """
-Run all domain adaptation methods on PIDSMaker transfer scenarios.
+Run domain adaptation methods on PIDSMaker transfer scenarios.
 
 Usage:
-    python run_da_methods.py --method stgan --source CADETS_E3 --target THEIA_E3 [--gpu]
     python run_da_methods.py --method puda --source CADETS_E3 --target THEIA_E3 [--gpu]
-    python run_da_methods.py --all  # Run all methods × all scenarios
+    python run_da_methods.py --method udagcn --source CADETS_E3 --target THEIA_E3 [--gpu]
+    python run_da_methods.py --all  # Run all DA methods × all scenarios
 
-Methods: stgan, puda, udagcn, a2gnn
+Domain Adaptation Methods: puda, udagcn, a2gnn
+(STGAN is an anomaly detector, not a DA method - use transfer_inference.py for it)
 """
 import argparse
 import os
@@ -130,7 +131,7 @@ def run_single_experiment(method_name, source_name, target_name, cfg):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--method", type=str, choices=['stgan', 'puda', 'udagcn', 'a2gnn', 'all'], default='all')
+    parser.add_argument("--method", type=str, choices=['puda', 'udagcn', 'a2gnn', 'all'], default='all')
     parser.add_argument("--source", type=str, default=None)
     parser.add_argument("--target", type=str, default=None)
     parser.add_argument("--cpu", action="store_true", default=True)
@@ -157,7 +158,7 @@ def main():
         ("CADETS_E3", "optc_h051", "S8"),
     ]
     
-    methods = ['stgan', 'puda', 'udagcn', 'a2gnn'] if args.method == 'all' else [args.method]
+    methods = ['puda', 'udagcn', 'a2gnn'] if args.method == 'all' else [args.method]
     
     if args.source and args.target:
         scenarios = [(args.source, args.target, "custom")]
