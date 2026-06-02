@@ -3,10 +3,10 @@ Run all domain adaptation methods on PIDSMaker transfer scenarios.
 
 Usage:
     python run_da_methods.py --method stgan --source CADETS_E3 --target THEIA_E3 [--gpu]
+    python run_da_methods.py --method puda --source CADETS_E3 --target THEIA_E3 [--gpu]
     python run_da_methods.py --all  # Run all methods × all scenarios
 
-Methods: stgan, udagcn, a2gnn
-(PUDA uses transfer_inference.py separately)
+Methods: stgan, puda, udagcn, a2gnn
 """
 import argparse
 import os
@@ -19,6 +19,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from methods.stgan.adapter import STGANTransfer
+from methods.puda.adapter import PUDATransfer
 from methods.udagcn.adapter import UDAGCNTransfer
 from methods.a2gnn.adapter import A2GNNTransfer
 
@@ -26,6 +27,8 @@ from methods.a2gnn.adapter import A2GNNTransfer
 def get_method(name, cfg, device):
     methods = {
         'stgan': STGANTransfer(cfg, device, epochs=50),
+        'puda': PUDATransfer(cfg, device, epochs=30, lr=0.005, batch_size=2048,
+                             gat_hidden=64, use_gcn=True, lambda_sal=3.0, lambda_adv=1.0),
         'udagcn': UDAGCNTransfer(cfg, device, epochs=200),
         'a2gnn': A2GNNTransfer(cfg, device, epochs=200, s_pnums=0, t_pnums=10),
     }
@@ -127,7 +130,7 @@ def run_single_experiment(method_name, source_name, target_name, cfg):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--method", type=str, choices=['stgan', 'udagcn', 'a2gnn', 'all'], default='all')
+    parser.add_argument("--method", type=str, choices=['stgan', 'puda', 'udagcn', 'a2gnn', 'all'], default='all')
     parser.add_argument("--source", type=str, default=None)
     parser.add_argument("--target", type=str, default=None)
     parser.add_argument("--cpu", action="store_true", default=True)
@@ -154,7 +157,7 @@ def main():
         ("CADETS_E3", "optc_h051", "S8"),
     ]
     
-    methods = ['stgan', 'udagcn', 'a2gnn'] if args.method == 'all' else [args.method]
+    methods = ['stgan', 'puda', 'udagcn', 'a2gnn'] if args.method == 'all' else [args.method]
     
     if args.source and args.target:
         scenarios = [(args.source, args.target, "custom")]
